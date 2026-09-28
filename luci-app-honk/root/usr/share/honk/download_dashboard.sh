@@ -2,7 +2,15 @@
 # Download and install Dashboard for HONK
 
 TARGET_DIR="${1:-/etc/honk/dashboard}"
-DOWNLOAD_URL="${2:-https://github.com/Zephyruso/zashboard/releases/latest/download/dist-no-fonts.zip}"
+if [ -z "${2:-}" ]; then
+    if [ "$TARGET_DIR" = "/etc/honk/zashboard" ]; then
+        DOWNLOAD_URL="https://github.com/Zephyruso/zashboard/releases/latest/download/dist-no-fonts.zip"
+    else
+        DOWNLOAD_URL="https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.8/doona-0.1.0-beta.8.tar.gz"
+    fi
+else
+    DOWNLOAD_URL="$2"
+fi
 
 LOG_FILE="/tmp/honk_dashboard_download.log"
 STATUS_FILE="/tmp/honk_dashboard_download.status"

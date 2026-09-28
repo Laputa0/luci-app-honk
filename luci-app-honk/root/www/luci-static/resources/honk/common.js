@@ -85,12 +85,6 @@ var callHonkDownloadStatus = rpc.declare({
 	expect: { }
 });
 
-var callHonkEnableClashApi = rpc.declare({
-	object: 'luci.honk',
-	method: 'enable_clash_api',
-	expect: { }
-});
-
 var callHonkSwitchDashboardApi = rpc.declare({
 	object: 'luci.honk',
 	method: 'switch_dashboard_api',
@@ -602,7 +596,6 @@ return baseclass.extend({
 	callHonkDownloadDashboard: callHonkDownloadDashboard,
 	callHonkDownloadZashboard: callHonkDownloadDashboard,
 	callHonkDownloadStatus: callHonkDownloadStatus,
-	callHonkEnableClashApi: callHonkEnableClashApi,
 	callHonkSwitchDashboardApi: callHonkSwitchDashboardApi,
 	readFile: readFile,
 	writeFile: writeFile,
