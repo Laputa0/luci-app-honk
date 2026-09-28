@@ -8,7 +8,7 @@ UPSTREAM_REPO="Zakkaus/doona"
 echo "==> Updating embedded Doona dashboard..."
 echo "Target directory: $TARGET_DIR"
 
-# 1. Fetch latest release tag
+# Fetch latest release tag
 RELEASES_HTML="$(curl -fsSL --retry 3 --connect-timeout 10 "https://github.com/${UPSTREAM_REPO}/releases" 2>/dev/null || true)"
 LATEST_TAG="$(printf "%s" "$RELEASES_HTML" | grep -o 'releases/tag/[^"/]*' | head -n 1 | sed 's|releases/tag/||')"
 
@@ -20,7 +20,7 @@ fi
 [ -n "$LATEST_TAG" ] || { echo "Error: Failed to resolve latest release tag for ${UPSTREAM_REPO}" >&2; exit 1; }
 echo "Latest release tag: $LATEST_TAG"
 
-# 2. Resolve asset download URL (handling both doona-X.X.X.tar.gz and doona-vX.X.X.tar.gz)
+# Resolve asset download URL
 ASSETS_HTML="$(curl -fsSL --retry 3 --connect-timeout 10 "https://github.com/${UPSTREAM_REPO}/releases/expanded_assets/${LATEST_TAG}" 2>/dev/null || true)"
 ASSET_PATH="$(printf "%s" "$ASSETS_HTML" | grep -o "/${UPSTREAM_REPO}/releases/download/[^\"]*/doona-[^\"]*\\.tar\\.gz" | grep -v 'fonts' | head -n 1 || true)"
 
@@ -31,12 +31,11 @@ if [ -n "$ASSET_PATH" ]; then
     DOWNLOAD_URL="https://github.com${ASSET_PATH}"
     echo "Found upstream asset: $ASSET_PATH"
 else
-    # Inferred fallback: try without 'v' first (doona-0.1.0-beta.2.tar.gz), then with 'v'
     DOWNLOAD_URL="https://github.com/${UPSTREAM_REPO}/releases/download/${LATEST_TAG}/doona-${TAG_NO_V}.tar.gz"
     echo "Inferred asset URL: $DOWNLOAD_URL"
 fi
 
-# 3. Download and extract
+# Download and extract
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -73,7 +72,7 @@ fi
 
 [ -f "$DEPLOY_SRC/index.html" ] || { echo "Error: index.html not found in extracted archive." >&2; exit 1; }
 
-# 4. Deploy to target directory
+# Deploy to target directory
 mkdir -p "$TARGET_DIR"
 rm -rf "${TARGET_DIR:?}"/* "${TARGET_DIR:?}"/.[!.]* 2>/dev/null || true
 cp -rf "$DEPLOY_SRC/"* "$TARGET_DIR/"
