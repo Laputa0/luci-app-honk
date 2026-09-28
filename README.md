@@ -51,6 +51,8 @@ honk 采用模块化拆分配置，主配置与子模块均位于 `/etc/honk/`�
 
 ## 控制面板 (Doona)
 
+![Doona 控制面板](PIC/PIC.jpg)
+
 > [!NOTE]
 > 当前 **Doona** 控制面板仍在积极开发中。如需尝试体验相关功能（如 Native API、配置在线编辑与 GeoData 规则集更新等），需要自行替换 debug 版本的 `honk-core` 核心（替换路径为 `/usr/bin/honk-core`）。
 
