@@ -22,7 +22,7 @@ echo "Latest release tag: $LATEST_TAG"
 
 # 2. Resolve asset download URL (handling both doona-X.X.X.tar.gz and doona-vX.X.X.tar.gz)
 ASSETS_HTML="$(curl -fsSL --retry 3 --connect-timeout 10 "https://github.com/${UPSTREAM_REPO}/releases/expanded_assets/${LATEST_TAG}" 2>/dev/null || true)"
-ASSET_PATH="$(printf "%s" "$ASSETS_HTML" | grep -o "/${UPSTREAM_REPO}/releases/download/[^\"]*\\.tar\\.gz" | grep -v 'fonts' | head -n 1 || true)"
+ASSET_PATH="$(printf "%s" "$ASSETS_HTML" | grep -o "/${UPSTREAM_REPO}/releases/download/[^\"]*/doona-[^\"]*\\.tar\\.gz" | grep -v 'fonts' | head -n 1 || true)"
 
 TAG_NO_V="${LATEST_TAG#[vV]}"
 DOWNLOAD_URL=""

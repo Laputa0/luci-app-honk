@@ -305,7 +305,7 @@ function download_dashboard(req) {
 	let url = req.args ? req.args.url : null;
 	if (!url) {
 		if (requested_type == "doona") {
-			url = "https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.3/doona-v0.1.0-beta.3.tar.gz";
+			url = "https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.8/doona-0.1.0-beta.8.tar.gz";
 		} else {
 			url = "https://github.com/Zephyruso/zashboard/releases/latest/download/dist-no-fonts.zip";
 		}

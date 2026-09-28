@@ -60,16 +60,15 @@ return view.extend({
 				exampleConfig: "experimental {\n    native_api {\n        enabled: true\n        listen: '0.0.0.0:9527'\n        secret: 'honk114514'\n        ui: '/etc/honk/dashboard'\n        config_write: true\n        geosite_download_url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat'\n        geoip_download_url: 'https://raw.githubusercontent.com/QiuSimons/geoip-moedove/refs/heads/main/geoip.dat'\n    }\n}",
 				buildUrl: function(info, targetHost, port, secret, protocol, forceFresh) {
 					var hostPart = (targetHost.indexOf(':') !== -1 && targetHost.charAt(0) !== '[') ? '[' + targetHost + ']' : targetHost;
-					var origin = protocol + '://' + hostPart + ':' + port;
-					var url = origin + '/ui/';
-					if (secret) {
-						url += '#/settings?api=' + encodeURIComponent(origin) + '&token=' + encodeURIComponent(secret);
+					var url = protocol + '://' + hostPart + ':' + port + '/ui/';
+					if (forceFresh) {
+						url += '?_t=' + Date.now();
 					}
 					return url;
 				},
-				githubRelease: 'https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.3/doona-v0.1.0-beta.3.tar.gz',
-				ghfastMirror: 'https://ghfast.top/https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.3/doona-v0.1.0-beta.3.tar.gz',
-				ghproxyMirror: 'https://ghproxy.net/https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.3/doona-v0.1.0-beta.3.tar.gz',
+				githubRelease: 'https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.8/doona-0.1.0-beta.8.tar.gz',
+				ghfastMirror: 'https://ghfast.top/https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.8/doona-0.1.0-beta.8.tar.gz',
+				ghproxyMirror: 'https://ghproxy.net/https://github.com/Zakkaus/doona/releases/download/v0.1.0-beta.8/doona-0.1.0-beta.8.tar.gz',
 				pkgName: 'doona-*.tar.gz'
 			}
 		};
