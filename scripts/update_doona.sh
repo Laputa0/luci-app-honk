@@ -77,6 +77,7 @@ fi
 mkdir -p "$TARGET_DIR"
 rm -rf "${TARGET_DIR:?}"/* "${TARGET_DIR:?}"/.[!.]* 2>/dev/null || true
 cp -rf "$DEPLOY_SRC/"* "$TARGET_DIR/"
+rm -rf "$TARGET_DIR"/*.md "$TARGET_DIR"/LICENSE* "$TARGET_DIR"/NOTICE "$TARGET_DIR"/LICENSES 2>/dev/null || true
 find "$TARGET_DIR" -type d -exec chmod 755 {} +
 find "$TARGET_DIR" -type f -exec chmod 644 {} +
 

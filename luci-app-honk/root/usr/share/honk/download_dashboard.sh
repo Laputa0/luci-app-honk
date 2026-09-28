@@ -174,6 +174,7 @@ if [ -n "$TARGET_DIR" ] && [ "$TARGET_DIR" != "/" ] && [ "$TARGET_DIR" != "/etc"
     rm -rf "${TARGET_DIR:?}"/* "${TARGET_DIR:?}"/.[!.]* 2>/dev/null || true
 fi
 cp -rf "$DEPLOY_SRC/"* "$TARGET_DIR/"
+rm -rf "$TARGET_DIR"/*.md "$TARGET_DIR"/LICENSE* "$TARGET_DIR"/NOTICE "$TARGET_DIR"/LICENSES 2>/dev/null || true
 chmod -R 755 "$TARGET_DIR"
 
 if [ -f "$TARGET_DIR/index.html" ]; then

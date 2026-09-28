@@ -278,7 +278,7 @@ return view.extend({
 				_('Native API is configured, but dashboard files are missing in the UI directory. You can download and deploy it directly.')
 			),
 			E('table', { 'class': 'table', 'style': 'margin: 14px 0;' }, [
-				E('tr', {}, [ E('th', { 'style': 'width: 25%;' }, _('Target Dashboard')), selectDashboardMissing ]),
+				E('tr', {}, [ E('th', { 'style': 'width: 25%;' }, _('Target Dashboard')), E('td', {}, selectDashboardMissing) ]),
 				E('tr', {}, [ E('th', {}, _('Target Directory (ui)')), metaUiDir ]),
 				E('tr', {}, [ E('th', {}, _('Listen Address & Port')), metaController ]),
 				E('tr', {}, [ E('th', {}, _('API Secret')), metaSecret ])

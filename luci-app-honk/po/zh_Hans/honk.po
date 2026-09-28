@@ -235,9 +235,6 @@ msgstr "关闭"
 msgid "Download error:"
 msgstr "触发下载异常："
 
-msgid "Configured (Hidden)"
-msgstr "已设置 (隐藏)"
-
 msgid "Not configured (Empty)"
 msgstr "未设置（留空）"
 
@@ -306,9 +303,6 @@ msgstr "认证密钥已复制到剪贴板: "
 
 msgid "Token: "
 msgstr "认证密钥: "
-
-msgid "Click or drag to select Token"
-msgstr "点击或拖选认证密钥"
 
 msgid "API Settings"
 msgstr "API 设置"
