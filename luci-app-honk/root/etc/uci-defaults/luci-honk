@@ -3,7 +3,7 @@
 [ -f /usr/share/honk/download_dashboard.sh ] && chmod +x /usr/share/honk/download_dashboard.sh
 [ -f /usr/share/honk/download_zashboard.sh ] && rm -f /usr/share/honk/download_zashboard.sh
 
-mkdir -p /etc/honk/config.d
+mkdir -p /etc/honk/config.d /etc/honk/state
 if [ ! -f /etc/honk/config.d/api.dae ]; then
 	cat << 'EOF' > /etc/honk/config.d/api.dae
 # api.dae
@@ -21,8 +21,10 @@ experimental {
     }
 }
 EOF
-	chmod 640 /etc/honk/config.d/api.dae 2>/dev/null || true
 fi
+chmod -R u=rwX,go= /etc/honk 2>/dev/null || true
+chmod 700 /etc/honk /etc/honk/config.d /etc/honk/state 2>/dev/null || true
+
 
 # Clean any legacy clash_api or native_api from /etc/honk/config.dae to avoid conflicts
 if [ -f /etc/honk/config.dae ]; then
