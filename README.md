@@ -30,7 +30,7 @@ honk 目前只提供 `x86_64` 与 `aarch64` 的静态 musl 二进制，因此包
 ## 配置
 
 默认配置在 `/etc/honk/config.dae`，拆分配置位于
-`/etc/honk/config.d/{node,route,dns}.dae`。首次使用前请替换示例节点与订阅。
+`/etc/honk/config.d/{node,route,dns,api}.dae`。首次使用前请替换示例节点与订阅。
 
 ## 版本号
 
