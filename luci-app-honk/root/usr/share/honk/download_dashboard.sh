@@ -1,7 +1,7 @@
 #!/bin/sh
 # Download and install Dashboard for HONK
 
-TARGET_DIR="${1:-/etc/honk/dashboard}"
+TARGET_DIR="${1:-/etc/honk/doona}"
 if [ -z "${2:-}" ]; then
     if [ "$TARGET_DIR" = "/etc/honk/zashboard" ]; then
         DOWNLOAD_URL="https://github.com/Zephyruso/zashboard/releases/latest/download/dist-no-fonts.zip"

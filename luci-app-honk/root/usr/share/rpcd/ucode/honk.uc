@@ -265,8 +265,8 @@ function get_dashboard_info(req) {
 		has_native_api: !!(parsed_native && parsed_native.enabled)
 	};
 
-	let target_default_ui = (requested_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/dashboard";
-	let other_default_ui = (requested_type == "zashboard") ? "/etc/honk/dashboard" : "/etc/honk/zashboard";
+	let target_default_ui = (requested_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/doona";
+	let other_default_ui = (requested_type == "zashboard") ? "/etc/honk/doona" : "/etc/honk/zashboard";
 
 	if (parsed_native && parsed_native.enabled) {
 		res.external_controller = parsed_native.listen;
@@ -319,8 +319,8 @@ function download_dashboard(req) {
 
 	let api_cfg = get_api_config();
 	let parsed_native = api_cfg.parsed_native;
-	let other_default_ui = (requested_type == "zashboard") ? "/etc/honk/dashboard" : "/etc/honk/zashboard";
-	let target_dir = (requested_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/dashboard";
+	let other_default_ui = (requested_type == "zashboard") ? "/etc/honk/doona" : "/etc/honk/zashboard";
+	let target_dir = (requested_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/doona";
 	if (parsed_native && parsed_native.ui && parsed_native.ui != other_default_ui) {
 		target_dir = parsed_native.ui;
 	}
@@ -354,7 +354,7 @@ function switch_dashboard_api(target_type) {
 	let parsed_clash = api_cfg.parsed_clash;
 	let parsed_native = api_cfg.parsed_native;
 
-	let target_ui = (target_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/dashboard";
+	let target_ui = (target_type == "zashboard") ? "/etc/honk/zashboard" : "/etc/honk/doona";
 
 	// Check if already correctly configured in api.dae
 	if (!api_cfg.is_legacy) {

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TARGET_DIR="${1:-$REPO_DIR/luci-app-honk/root/etc/honk/dashboard}"
+TARGET_DIR="${1:-$REPO_DIR/luci-app-honk/root/etc/honk/doona}"
 UPSTREAM_REPO="Zakkaus/doona"
 
 echo "==> Updating embedded Doona dashboard..."

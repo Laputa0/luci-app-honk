@@ -430,7 +430,7 @@ function createConfigFileView(filePath, mapTitle, mapDesc, fieldTitle, successMs
 							'        enabled: true',
 							"        listen: '0.0.0.0:9527'",
 							"        secret: 'honk114514'",
-							"        ui: '/etc/honk/dashboard'",
+							"        ui: '/etc/honk/doona'",
 							"        config_write: true",
 							"        geosite_download_url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat'",
 							"        geoip_download_url: 'https://raw.githubusercontent.com/QiuSimons/geoip-moedove/refs/heads/main/geoip.dat'",
