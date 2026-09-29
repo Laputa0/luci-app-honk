@@ -1,10 +1,15 @@
 'use strict';
 'require view';
 'require ui';
+'require uci';
 'require poll';
 'require honk.common as honk';
 
 return view.extend({
+	load: function() {
+		return uci.load('honk');
+	},
+
 	handleSaveApply: null,
 	handleSave: null,
 	handleReset: null,

@@ -1,6 +1,7 @@
 'use strict';
 'require baseclass';
 'require rpc';
+'require uci';
 'require fs';
 'require ui';
 'require poll';
@@ -86,13 +87,6 @@ var callHonkSwitchDashboardApi = rpc.declare({
 	method: 'switch_dashboard_api',
 	params: [ 'type' ],
 	expect: { }
-});
-
-var callUciGet = rpc.declare({
-	object: 'uci',
-	method: 'get',
-	params: [ 'config', 'section', 'option' ],
-	expect: { value: '' }
 });
 
 function readFile(path) {
@@ -411,6 +405,10 @@ function initCodeMirror(textarea, onSaveCallback) {
 
 function createConfigFileView(filePath, mapTitle, mapDesc, fieldTitle, successMsg, needRestart) {
 	return view.extend({
+		load: function() {
+			return uci.load('honk');
+		},
+
 		render: function() {
 			var m = new form.Map('honk', mapTitle, mapDesc);
 
@@ -454,12 +452,11 @@ function createConfigFileView(filePath, mapTitle, mapDesc, fieldTitle, successMs
 // - dns, node, route are hidden when advanced=0
 // - api is hidden when dashboard=none
 function applyTabVisibility() {
-	return Promise.all([
-		L.resolveDefault(callUciGet('honk', 'config', 'advanced'), '0'),
-		L.resolveDefault(callUciGet('honk', 'config', 'dashboard'), 'none')
-	]).then(function(res) {
-		var isAdvanced = (res[0] === '1');
-		var dashType = res[1] || 'none';
+	return uci.load('honk').then(function() {
+		var sections = uci.sections('honk', 'honk');
+		var s = (sections && sections[0]) ? sections[0] : (uci.get('honk', 'config') || {});
+		var isAdvanced = (s.advanced === '1');
+		var dashType = s.dashboard || '';
 
 		var hiddenTabs = [];
 		if (!isAdvanced) {
