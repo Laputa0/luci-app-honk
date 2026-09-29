@@ -14,12 +14,23 @@ function get_dashboard_dir(type) {
 	return DASHBOARD_DIRS[type] || DASHBOARD_DIRS.doona;
 }
 
+let cached_pid = null;
+
 function get_honk_pid() {
+	if (cached_pid) {
+		let cmd = readfile("/proc/" + cached_pid + "/cmdline");
+		if (cmd && match(cmd, /honk-core/)) {
+			return cached_pid;
+		}
+		cached_pid = null;
+	}
+
 	let p = popen("pidof honk-core 2>/dev/null");
 	let pids = p ? p.read("all") : "";
 	if (p) p.close();
 	let m = match(pids, /([0-9]+)/);
-	return m ? m[1] : null;
+	cached_pid = m ? m[1] : null;
+	return cached_pid;
 }
 
 function parse_host_port(addr) {

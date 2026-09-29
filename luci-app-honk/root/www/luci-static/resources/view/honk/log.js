@@ -15,9 +15,8 @@ return view.extend({
 	handleReset: null,
 
 	render: function() {
-		var applyTabs = (honk && (honk.applyTabVisibility || honk.applyAdvancedTabVisibility));
-		if (applyTabs) {
-			applyTabs();
+		if (honk && honk.applyTabVisibility) {
+			honk.applyTabVisibility();
 		}
 
 		var scrolled = false;

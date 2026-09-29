@@ -17,9 +17,8 @@ return view.extend({
 	},
 
 	render: function() {
-		var applyTabs = (honk && (honk.applyTabVisibility || honk.applyAdvancedTabVisibility));
-		if (applyTabs) {
-			applyTabs();
+		if (honk && honk.applyTabVisibility) {
+			honk.applyTabVisibility();
 		}
 		var sec = (uci.sections('honk', 'honk')[0] || {});
 		var sid = sec['.name'] || 'config';

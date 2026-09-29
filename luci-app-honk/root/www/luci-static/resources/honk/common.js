@@ -199,6 +199,18 @@ function ensureCodeMirror() {
 	return _cmPromise;
 }
 
+function preloadCodeMirror() {
+	if (window.requestIdleCallback) {
+		requestIdleCallback(function() {
+			ensureCodeMirror().catch(function() {});
+		}, { timeout: 2000 });
+	} else {
+		setTimeout(function() {
+			ensureCodeMirror().catch(function() {});
+		}, 300);
+	}
+}
+
 function formatEditor(ed) {
 	ed.operation(function() {
 		var cursor = ed.getCursor();
@@ -308,11 +320,28 @@ function bindCodeMirrorToMap(m, onSaveCallback) {
 		return origRenderContents.apply(this, arguments).then(function(mapNode) {
 			var target = mapNode || m.root || document.getElementById('cbi-' + m.config) || document;
 			target.querySelectorAll('textarea').forEach(function(ta) {
-				initCodeMirror(ta, onSaveCallback).then(function(editor) {
-					requestAnimationFrame(function() {
-						editor.refresh();
+				if (ta.dataset.cmInitialized === 'true' || ta._editor) return;
+
+				if (ta.offsetParent !== null) {
+					initCodeMirror(ta, onSaveCallback);
+				} else if (window.IntersectionObserver) {
+					var row = ta.closest('.cbi-value') || ta;
+					var io = new IntersectionObserver(function(entries) {
+						if (entries[0] && entries[0].isIntersecting) {
+							io.disconnect();
+							initCodeMirror(ta, onSaveCallback).then(function(editor) {
+								if (editor) {
+									requestAnimationFrame(function() {
+										editor.refresh();
+									});
+								}
+							});
+						}
 					});
-				});
+					io.observe(row);
+				} else {
+					initCodeMirror(ta, onSaveCallback);
+				}
 			});
 			return mapNode;
 		});
@@ -448,39 +477,46 @@ function createConfigFileView(filePath, mapTitle, mapDesc, fieldTitle, successMs
 }
 
 
+function updateTabVisibilityFromSections(sections) {
+	var s = (sections && sections[0]) ? sections[0] : (uci.get('honk', 'config') || {});
+	var isAdvanced = (s.advanced === '1');
+	var dashType = s.dashboard || '';
+
+	var hiddenTabs = [];
+	if (!isAdvanced) {
+		hiddenTabs.push('dns', 'node', 'route');
+	}
+	if (dashType === 'none') {
+		hiddenTabs.push('api');
+	}
+
+	applyTabCss(hiddenTabs);
+
+	var currentTab = (window.L && L.env && Array.isArray(L.env.dispatchpath)) ? L.env.dispatchpath[3] : '';
+	if (!currentTab) {
+		var m = window.location.pathname.match(/\/honk\/([a-z0-9_-]+)/);
+		if (m) currentTab = m[1];
+	}
+	if (currentTab && hiddenTabs.indexOf(currentTab) !== -1) {
+		window.location.href = L.url('admin/services/honk/global');
+	}
+}
+
 // Tab visibility control:
 // - dns, node, route are hidden when advanced=0
 // - api is hidden when dashboard=none
 function applyTabVisibility() {
+	var sections = uci.sections('honk', 'honk');
+	if (sections && sections.length) {
+		updateTabVisibilityFromSections(sections);
+		return Promise.resolve();
+	}
+
 	return uci.load('honk').then(function() {
-		var sections = uci.sections('honk', 'honk');
-		var s = (sections && sections[0]) ? sections[0] : (uci.get('honk', 'config') || {});
-		var isAdvanced = (s.advanced === '1');
-		var dashType = s.dashboard || '';
-
-		var hiddenTabs = [];
-		if (!isAdvanced) {
-			hiddenTabs.push('dns', 'node', 'route');
-		}
-		if (dashType === 'none') {
-			hiddenTabs.push('api');
-		}
-
-		applyTabCss(hiddenTabs);
-
-		var currentTab = (window.L && L.env && Array.isArray(L.env.dispatchpath)) ? L.env.dispatchpath[3] : '';
-		if (!currentTab) {
-			var m = window.location.pathname.match(/\/honk\/([a-z0-9_-]+)/);
-			if (m) currentTab = m[1];
-		}
-		if (currentTab && hiddenTabs.indexOf(currentTab) !== -1) {
-			window.location.href = L.url('admin/services/honk/global');
-		}
+		updateTabVisibilityFromSections(uci.sections('honk', 'honk'));
 	}).catch(function() {
 	});
 }
-
-var applyAdvancedTabVisibility = applyTabVisibility;
 
 function applyTabCss(hiddenTabs) {
 	var styleId = 'honk-tab-visibility-style';
@@ -500,6 +536,14 @@ function applyTabCss(hiddenTabs) {
 		}).join(',\n') + ' { display: none !important; }';
 	}
 }
+
+// Early synchronous check if UCI data is already loaded in memory
+try {
+	var _earlySections = uci.sections('honk', 'honk');
+	if (_earlySections && _earlySections.length) {
+		updateTabVisibilityFromSections(_earlySections);
+	}
+} catch (e) {}
 
 function renderStatusHeader() {
 	var statusEl = E('span', { 'id': 'honk_status', 'style': 'font-weight: 500;' }, [
@@ -557,16 +601,17 @@ function renderStatusHeader() {
 
 	poll.add(function() {
 		return callHonkStatus().then(updateStatus);
-	}, 3);
+	}, 5);
 
 	applyTabVisibility();
 
 	return section;
 }
 
+preloadCodeMirror();
+
 return baseclass.extend({
 	applyTabVisibility: applyTabVisibility,
-	applyAdvancedTabVisibility: applyTabVisibility,
 	callHonkStatus: callHonkStatus,
 	callHonkReload: callHonkReload,
 	callHonkRestart: callHonkRestart,
@@ -579,6 +624,7 @@ return baseclass.extend({
 	readFile: readFile,
 	writeFile: writeFile,
 	ensureCodeMirror: ensureCodeMirror,
+	preloadCodeMirror: preloadCodeMirror,
 	formatEditor: formatEditor,
 	initCodeMirror: initCodeMirror,
 	bindCodeMirrorToMap: bindCodeMirrorToMap,
