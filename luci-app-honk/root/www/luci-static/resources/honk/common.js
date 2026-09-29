@@ -478,7 +478,7 @@ function createConfigFileView(filePath, mapTitle, mapDesc, fieldTitle, successMs
 
 
 function updateTabVisibilityFromSections(sections) {
-	var s = (sections && sections[0]) ? sections[0] : (uci.get('honk', 'config') || {});
+	var s = (sections && sections[0]) ? sections[0] : (uci.get_first('honk', 'honk') || {});
 	var isAdvanced = (s.advanced === '1');
 	var dashType = s.dashboard || '';
 

@@ -51,8 +51,9 @@ return view.extend({
 		function updateLog() {
 			return honk.callHonkGetLog().then(function(data) {
 				var content = (data && data.log) ? data.log : '';
+				var atBottom = !scrolled || (logTextarea.scrollHeight - logTextarea.scrollTop - logTextarea.clientHeight < 50);
 				logTextarea.value = content;
-				if (!scrolled && content) {
+				if (atBottom && content) {
 					logTextarea.scrollTop = logTextarea.scrollHeight;
 					scrolled = true;
 				}
@@ -62,8 +63,17 @@ return view.extend({
 		updateLog();
 
 		poll.add(function() {
+			if (document.hidden) {
+				return Promise.resolve();
+			}
 			return updateLog();
 		}, 3);
+
+		document.addEventListener('visibilitychange', function() {
+			if (!document.hidden) {
+				updateLog();
+			}
+		});
 
 		return E('fieldset', { 'class': 'cbi-section', 'id': '_log_fieldset' }, [
 			E('legend', {}, _('Logs')),
