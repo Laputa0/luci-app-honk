@@ -9,6 +9,7 @@ PKG_RELEASE:=1
 # Raw upstream release tag. It keeps the dots in qualifiers (e.g. v0.0.1.beta.49)
 # because that is what the GitHub release asset name uses.
 HONK_RELEASE_TAG:=v0.0.1.beta.83
+HONK_ASSET_TAG:=v0.0.1.beta.83
 
 # SHA256 of each release tarball, kept in sync by scripts/update_honk_version.sh.
 HONK_HASH_X86_64:=0d440bc094a4ceead94a897647b3c598f6ca7630c65a1675ed137e3d9c1c0c56
@@ -29,7 +30,7 @@ endif
 # Default to the stock-malloc build: lower RSS high-water on small gateways.
 # Use an empty suffix to switch back to the mimalloc build (faster QUIC).
 HONK_SUFFIX:=-stock
-HONK_ASSET:=honk-core-$(HONK_RELEASE_TAG)-$(HONK_TARGET)$(HONK_SUFFIX).tar.gz
+HONK_ASSET:=honk-core-$(HONK_ASSET_TAG)-$(HONK_TARGET)$(HONK_SUFFIX).tar.gz
 
 PKG_SOURCE:=$(HONK_ASSET)
 PKG_SOURCE_URL:=https://github.com/daeuniverse/honk/releases/download/$(HONK_RELEASE_TAG)/
