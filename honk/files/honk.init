@@ -5,7 +5,6 @@ START=96
 STOP=10
 
 extra_command "hot_reload" "Hot-reload service"
-extra_command "update_dns" "Update hijacked resolv.conf"
 
 CONF="honk"
 PROG="/usr/bin/honk-core"
@@ -32,67 +31,36 @@ cleanup_netns() {
 }
 
 hijack_resolv_conf() {
-    local auto_file="/tmp/resolv.conf.d/resolv.conf.auto"
-    [ -s "$auto_file" ] || auto_file="/tmp/resolv.conf.auto"
-    local tmp="$RESOLV_HONK.tmp"
+    grep -q ' /tmp/resolv\.conf ' /proc/mounts && return 0
 
-    [ -f /tmp/resolv.conf ] || touch /tmp/resolv.conf
-    grep -E '^(search|domain) ' /tmp/resolv.conf > "$tmp" 2>/dev/null || true
+    grep -E '^(search|domain) ' /tmp/resolv.conf > "$RESOLV_HONK" 2>/dev/null
 
-    if [ -s "$auto_file" ]; then
-        awk '
-        /^# Interface/ {
-            iface = $3
-            sub(/([_-]?6)$/, "", iface)
-            next
-        }
-        /^nameserver/ && iface != "" {
-            if (!seen_iface[iface]) {
-                seen_iface[iface] = 1
-                ifaces[++count] = iface
-            }
-            if (!seen_dns[iface, $2]) {
-                seen_dns[iface, $2] = 1
-                if (dns_cnt[iface] < 3) {
-                    dns_cnt[iface]++
-                    dns[iface, dns_cnt[iface]] = $2
-                }
-            }
-        }
-        END {
-            if (count == 1) {
-                for (i = 1; i <= dns_cnt[ifaces[1]]; i++) {
-                    print "nameserver " dns[ifaces[1], i]
-                }
-            } else {
-                print "nameserver 223.5.5.5"
-                print "nameserver 119.29.29.29"
-                print "nameserver 2400:3200::1"
-            }
-        }
-        ' "$auto_file" >> "$tmp" 2>/dev/null
+    local dns_list LOGICAL_WAN
+    . /lib/functions/network.sh
+    network_find_wan LOGICAL_WAN 2>/dev/null
+    if [ -n "$LOGICAL_WAN" ]; then
+        dns_list=$(ubus call "network.interface.$LOGICAL_WAN" status 2>/dev/null | \
+            jsonfilter -e '@["dns-server"][*]' 2>/dev/null)
     fi
 
-    if ! grep -q '^nameserver' "$tmp" 2>/dev/null; then
-        echo "nameserver 223.5.5.5" >> "$tmp"
-        echo "nameserver 119.29.29.29" >> "$tmp"
-        echo "nameserver 2400:3200::1" >> "$tmp"
+    if [ -z "$dns_list" ] && [ -f "/tmp/resolv.conf.d/resolv.conf.auto" ]; then
+        dns_list=$(awk '/^nameserver/{print $2}' "/tmp/resolv.conf.d/resolv.conf.auto")
     fi
 
-    cat "$tmp" > "$RESOLV_HONK"
-    rm -f "$tmp"
+    [ -z "$dns_list" ] && dns_list="119.29.29.29 223.5.5.5"
 
-    if ! grep -Fq ' /tmp/resolv.conf ' /proc/mounts; then
-        mount --bind "$RESOLV_HONK" /tmp/resolv.conf
-        mount -o remount,ro,bind /tmp/resolv.conf
-    fi
+    for dns in $dns_list; do
+        echo "nameserver $dns" >> "$RESOLV_HONK"
+    done
+
+    mount --bind "$RESOLV_HONK" /tmp/resolv.conf
+    mount -o remount,ro,bind /tmp/resolv.conf
 }
 
 restore_resolv_conf() {
-    while grep -Fq ' /tmp/resolv.conf ' /proc/mounts; do
-        mount -o remount,rw,bind /tmp/resolv.conf 2>/dev/null
-        umount /tmp/resolv.conf 2>/dev/null || break
-    done
+    grep -q ' /tmp/resolv\.conf ' /proc/mounts || return 0
+    mount -o remount,rw,bind /tmp/resolv.conf 2>/dev/null
+    umount /tmp/resolv.conf 2>/dev/null
     rm -f "$RESOLV_HONK"
 }
 
@@ -133,17 +101,10 @@ reload_service() {
 
 service_triggers() {
     procd_add_reload_trigger "$CONF"
-    procd_add_raw_trigger "interface.*" 2000 /etc/init.d/honk update_dns
-}
-
-update_dns() {
-    /etc/init.d/honk running || return 0
-    hijack_resolv_conf
 }
 
 hot_reload() {
     set_chmod_640
-    hijack_resolv_conf
     if /etc/init.d/honk running; then
         "$PROG" reload
     else
