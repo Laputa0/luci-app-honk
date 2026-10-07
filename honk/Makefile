@@ -44,7 +44,7 @@ define Package/honk
   SUBMENU:=Web Servers/Proxies
   TITLE:=honk - eBPF transparent proxy engine (dae-compatible)
   URL:=https://github.com/Glassyiris/honk
-  DEPENDS:=@(x86_64||aarch64) \
+  DEPENDS:=@(x86_64||aarch64||aarch64_cortex-a53) \
     +ca-bundle +ip-full \
     +kmod-sched-core +kmod-sched-bpf +kmod-veth +kmod-nft-queue \
     +v2ray-geoip +v2ray-geosite \
