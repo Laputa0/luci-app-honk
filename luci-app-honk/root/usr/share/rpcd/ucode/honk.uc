@@ -374,6 +374,7 @@ function download_dashboard(req) {
 }
 
 function switch_dashboard_api(target_type) {
+	cached_pid = null;
 	let api_file = get_api_file_path();
 	let config_file = get_config_file_path();
 
@@ -478,6 +479,7 @@ return {
 
 		reload: {
 			call: function(req) {
+				cached_pid = null;
 				system("/etc/init.d/honk hot_reload >/dev/null 2>&1 &");
 				return { success: true };
 			}
@@ -485,6 +487,7 @@ return {
 
 		restart: {
 			call: function(req) {
+				cached_pid = null;
 				system("/etc/init.d/honk restart >/dev/null 2>&1 &");
 				return { success: true };
 			}
@@ -501,7 +504,8 @@ return {
 
 		clear_log: {
 			call: function(req) {
-				system("true > /var/log/honk/honk.log");
+				system("mkdir -p /var/log/honk");
+				writefile("/var/log/honk/honk.log", "");
 				return { success: true };
 			}
 		},
